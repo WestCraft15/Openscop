@@ -30,13 +30,15 @@ font_color = Color(0, 0, 0, 1)
 [sub_resource type="GDScript" id="GDScript_26wy2"]
 script/source = "extends Sprite2D
 
-var timer:float = 0
+var timer:int = 0
 
+func _physics_process(_delta):
+	timer += 1
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	timer +=delta
-	self.visible = !(int(timer)%2)
+	if timer == 30:
+		timer = 0
+
+	visible = timer < 24
 "
 
 [sub_resource type="Gradient" id="Gradient_xo8nd"]
@@ -71,18 +73,11 @@ shader_parameter/masked_color = Color(1, 1, 1, 1)
 [sub_resource type="GDScript" id="GDScript_ue0wc"]
 script/source = "extends MeshInstance3D
 
-var boot = false
-# Called when the node enters the scene tree for the first time.
-func _process(_delta):
-	if !boot:
-		animate()
-		boot=true
-func animate():
-	var scroll = create_tween()
-	scroll.tween_property(self,\"position:x\",-1.0,0.5).set_trans(Tween.TRANS_LINEAR)
-	await scroll.finished
-	self.position.x=0
-	boot=false
+func _process(delta):
+	position.x -= delta * 2
+
+	if position.x <= -1:
+		position.x += 1
 "
 
 [sub_resource type="GDScript" id="GDScript_v5jfi"]
@@ -91,10 +86,10 @@ script/source = "extends Node3D
 var timer:float = 0
 
 func _process(delta):
-	timer += delta
-	
 	rotation.z = -sin(2 * timer * PI) * cos(timer * PI / 5) * 0.25
-	rotation.y = cos(2 * (timer + 0.25) * PI) * sin(timer * PI / 5) * 0.4
+	rotation.y = -cos(2 * (timer + 0.25) * PI) * sin(timer * PI / 5) * 0.4
+
+	timer += delta
 "
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_6qn5j"]
@@ -110,12 +105,12 @@ shader_parameter/modulate_color = Color(1, 0.537255, 1, 1)
 [sub_resource type="GDScript" id="GDScript_xt5qy"]
 script/source = "extends Sprite3D
 
-var timer:float = 5
+var timer:float = 0
 
 func _process(delta):
+	rotation.z = cos(2 * timer * PI) * 0.2
+
 	timer += delta
-	
-	rotation.z = -sin(2 * timer * PI)/5
 "
 
 [node name="title" type="Node3D"]
